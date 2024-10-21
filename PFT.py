@@ -1,5 +1,10 @@
-print("**PERSONAL FINANCE TRACKER**")
+import time
 
+def sec(x):
+    return time.sleep(x)
+
+print("**PERSONAL FINANCE TRACKER**\n")
+sec(1)
 print("ENTER USERNAME BELOW")
 print("If you don't have an acccount, type \"new\" to sign up.")
 print("If you wish to update your information type \"update\".\n")
@@ -24,8 +29,12 @@ try:
 
         print("Max amnt of money users should spend per week")
 
-    if username=="update":
-        pass
+    while True:
+        if username=="update":
+            username = input("What is your username?\n")
+        # If username in files:
+            # Retrieve user
+            #
 except SyntaxError:
     print("Invalid character. Run the program again and use valid characters.")
 
@@ -35,7 +44,7 @@ except:
 
 # Classes ----------------------------------------------------------------------
 class User:
-    def __init__(self, budget, income, groceries, eatingout, housing, bigpayments, extra==0):
+    def __init__(self, budget, income, groceries, eatingout, housing, bigpayments, extra=0):
         self.budget=budget
         self.income=income
         self.groceries=groceries
@@ -43,6 +52,8 @@ class User:
         self.housing=housing
         self.bigpayments=bigpayments
         self.extra=extra
+
+print()
 
 
 
