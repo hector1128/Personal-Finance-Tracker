@@ -7,14 +7,15 @@ bigpayments=int(input("Do you have any big payments coming up?\n"))
 extra=int(input("Do you spend any extra money apart from what is stated here? If not, type \"0\""))
 
 class User:
-    def __init__(self, budget, income, groceries, eatingout, housing, bigpayments, extra=0):
+    def __init__(self, budget, income, groceries, transportation, housing, bigpayments, extra=0):
         self.budget=budget
         self.income=income
         self.groceries=groceries
-        self.eatingout=eatingout
+        self.transportation=transportation
         self.housing=housing
         self.bigpayments=bigpayments
         self.extra=extra
 
-    
-print(User.budget)
+user1=User(budget, income, groceries, transportation, housing, bigpayments, extra)
+
+print(user1.budget)
