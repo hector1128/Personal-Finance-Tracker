@@ -1,3 +1,4 @@
+name = input("Name: ")
 budget = int(input("How much money do you have?\n"))
 income = int(input("How much do you earn weekly?\n"))
 groceries=int(input("How much do you usually spend on groceries?\n"))
@@ -16,6 +17,9 @@ class User:
         self.bigpayments=bigpayments
         self.extra=extra
 
-user1=User(budget, income, groceries, transportation, housing, bigpayments, extra)
+name=User(budget, income, groceries, transportation, housing, bigpayments, extra)
 
-print(user1.budget)
+inp=input("Do you wanna see your budget?")
+if inp=="yes":
+    print(name.budget)
+
