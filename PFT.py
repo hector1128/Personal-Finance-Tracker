@@ -35,37 +35,58 @@ print("If you don't have an acccount, type \"new\" to sign up.")
 
 print("If you wish to update your information type \"update\".\n")
 
-username=input("U: ")
+username=input()
+
+
 
 try:
+    db = open("logindatabase.txt", "r")
+    if username in db:
+        def access():
+            pw = input("P: ")
+            if pw in db:
+                print("WELCOME BACK")
+
+                print('TOTAL BUDGET')
+                print(name.budget)
+                print('ratio between spendatures and income')
+
+                print("Max amnt of money users should spend per week")
+            else:
+                print("Password incorrect. Try again.")
+                access()
     if username =="new":
-        print("WELCOME TO PFT v1\n")
-        name = input("Create a username: ")
-        pw = input("Create a password: ")
-
-        login[name] = pw
-
-        budget = int(input("How much money do you have?\n"))
-        income = int(input("How much do you earn weekly?\n"))
-        groceries=int(input("How much do you usually spend on groceries?\n"))
-        transportation = int(input("How much do you spend weekly on your car/transportation?\n"))
-        housing=int(input("How much do you usually spend on housing?\n"))
-        bigpayments=int(input("Do you have any big payments coming up?\n"))
-        extra=int(input("Do you spend any extra money apart from what is stated here? If not, type \"0\"\n"))
-        name=User(budget, income, groceries, transportation, housing, bigpayments, extra)
-        # Save that info in a file ^^
+        def register():
+            db = open("logindatabase.txt", "r")
+            print("WELCOME TO PFT v1\n")
+            name = input("Create a username: ")
+            pw = input("Create a password: ")
+            pw2 = input("Re-enter your password: ")
+            if pw != pw2:
+                print("passwords do not match, try again.")
+                register()
+            if name in db:
+                print("Username already exists. Choose another one.")
+            db = open("logindatabase.txt", "a")
+            u = []
+            p = []
+            for i in db:
+                a,b=i.split(", ")
+                b= b.strip()
+                u.append(a)
+                p.append(b)
+            
+            budget = int(input("How much money do you have?\n"))
+            income = int(input("How much do you earn weekly?\n"))
+            groceries=int(input("How much do you usually spend on groceries?\n"))
+            transportation = int(input("How much do you spend weekly on your car/transportation?\n"))
+            housing=int(input("How much do you usually spend on housing?\n"))
+            bigpayments=int(input("Do you have any big payments coming up?\n"))
+            extra=int(input("Do you spend any extra money apart from what is stated here? If not, type \"0\"\n"))
+            name=User(budget, income, groceries, transportation, housing, bigpayments, extra)
+            # Save that info in a file ^^
         
-    if True: # if user in files:
-        pw = input("P: ")
-        #if pw in files:
-        
-        print("WELCOME BACK")
-
-        print('TOTAL BUDGET')
-        print(name.budget)
-        print('ratio between spendatures and income')
-
-        print("Max amnt of money users should spend per week")
+    
 
     while True:
         if username=="update":
