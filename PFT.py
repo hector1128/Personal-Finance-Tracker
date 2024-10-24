@@ -3,6 +3,8 @@ import time
 def sec(x):
     return time.sleep(x)
 
+login = {}
+
 # The user's information
 class User:
     def __init__(self, budget, income, groceries, transportation, housing, bigpayments, extra=0):
@@ -40,6 +42,8 @@ try:
         print("WELCOME TO PFT v1\n")
         name = input("Create a username: ")
         pw = input("Create a password: ")
+
+        login[name] = pw
 
         budget = int(input("How much money do you have?\n"))
         income = int(input("How much do you earn weekly?\n"))
