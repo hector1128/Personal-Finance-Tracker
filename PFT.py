@@ -19,7 +19,7 @@ def user_info(username):
         db.close()
     except SyntaxError:
         print("Input numbers only.")
-        user_info()
+        user_info(username)
 
 
 def home():
@@ -27,31 +27,19 @@ def home():
 
     sec(1)
 
-    print("ENTER USERNAME BELOW")
+    print("*----------ENTER USERNAME BELOW-----------*")
+
+    sec(3)
 
     print("If you don't have an acccount, type \"new\" to sign up.")
 
+    sec(1)
+
     print("If you wish to update your information type \"update\".\n")
 
-    username=input("U: ")
+    username=input()
 
-    try:
-        db = open("logindatabase.txt", "r")
-        users = db.readlines()
-        db.close()
-        for line in users:
-            user, pw = line.strip().split(", ")
-            if username==user:
-                def access():
-                    entered_pw = input("P: ")
-                    if entered_pw == pw:
-                        print(f"WELCOME BACK {username}!")
-                    else:
-                        print("Password incorrect. Try again.")
-                        access()
-                access()
-                break
-            
+    try:    
         if username =="new":
             def register():
                 db = open("logindatabase.txt", "r")
@@ -61,11 +49,13 @@ def home():
                 pw2 = input("Re-enter your password: ")
                 u = []
                 p = []
+                
                 for line in db:
-                    a,b=line.split(", ")
-                    b= b.strip()
-                    u.append(a)
-                    p.append(b)
+                    if line.strip():
+                        a,b=line.split(", ")
+                        b= b.strip()
+                        u.append(a)
+                        p.append(b)
                 login = dict(zip(u, p))
                 
                 if len(pw)<6:
@@ -93,12 +83,30 @@ def home():
         
         if username=="update":
             pass
+
+        db = open("logindatabase.txt", "r")
+        users = db.readlines()
+        db.close()
+        for line in users:
+            if line.strip():
+                user, pw = line.strip().split(", ")
+                if username==user:
+                    def access():
+                        entered_pw = input("P: ")
+                        if entered_pw == pw:
+                            print(f"WELCOME BACK {username}!")
+                        else:
+                            print("Password incorrect. Try again.")
+                            access()
+                    access()
+                    break
+
+        
             
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")
 
-    except:
-        print("Oops. Something went wrong. Try again.")
+    
 
 home()
 
