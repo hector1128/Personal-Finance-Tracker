@@ -1,2 +1,1 @@
-username: hector.cordero, budget: 10000, income: 200, groceries: 200, transportation: 200, housing: 200, bigpayment: 200, extra: 200
-username: james.williams, budget: 10000, income: 200, groceries: 200, transportation: 200, housing: 200, bigpayment: 200, extra: 200
+username: hector.cordero, budget: 10000, income: 200, groceries: 200, transportation: 200, housing: 400, bigpayment: 200, extra: 200
