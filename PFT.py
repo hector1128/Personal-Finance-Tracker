@@ -7,28 +7,31 @@ def sec(x):
 def user_info(username):
     try:            
         print("Let's get some personal info so we can build the right tracker for YOU!")
+        sec(2)
         budget = int(input("How much money do you have?\n"))
+        sec(1)
         income = int(input("How much do you earn weekly?\n"))
+        sec(1)
         groceries=int(input("How much do you usually spend on groceries?\n"))
+        sec(1)
         transportation = int(input("How much do you spend weekly on your car/transportation?\n"))
+        sec(1)
         housing=int(input("How much do you usually spend on housing?\n"))
+        sec(1)
         bigpayment=int(input("Do you have any big payments coming up?\n"))
+        sec(1)
         extra=int(input("Do you spend any extra money apart from what is stated here? If not, type \"0\"\n"))
         
         db = open("personalinfo.txt", "a")
         db.write(f"username: {username}, budget: {budget}, income: {income}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, extra: {extra}\n")
         db.close()
-    except SyntaxError:
+    except ValueError:
         print("Input numbers only.")
         user_info(username)
 
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 def home():
-    print("**PERSONAL FINANCE TRACKER**\n")
-
-    sec(1)
-
-    print("*----------ENTER USERNAME BELOW-----------*")
+    print("**----------------------------------------------------------PERSONAL FINANCE TRACKER**-----------------------------------------------------------------------\n")
 
     sec(3)
 
@@ -37,6 +40,10 @@ def home():
     sec(1)
 
     print("If you wish to update your information type **\"update\"**.\n")
+
+    sec(1)
+
+    print("*----------ENTER USERNAME BELOW-----------*")
 
     username=input("U: ")
 
@@ -103,7 +110,8 @@ def home():
 #-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
         if username=="update":
             def update():
-                username=input("What's your username??\n") 
+                username=input("What's your username??\n")
+                sec(3) 
                 db = open("personalinfo.txt", "r")
                 lines=db.readlines()
                 db.close()
@@ -112,9 +120,11 @@ def home():
    
                 def updateinfo():
                     newinfo=input("What do you want to change?\n") 
+                    sec(3)
                     if newinfo in info:
                         try:
                             updatevalue=int(input(f"Enter your new {newinfo}. (Type a number)\n"))
+                            sec(3)
                             info[newinfo]=updatevalue
                             inputvalue=""
                             inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
@@ -128,11 +138,13 @@ def home():
                             db.close()
                         except:
                             print("Make sure to input a number ONLY.")
+                            sec(1)
                             updateinfo() 
 
                     else:
                         print("Invalid entry. Make sure you type one of the following:")
                         print("budget, income, groceries, transportation, housing, bigpayment, extra")
+                        sec(3)
                         updateinfo()
                 checkforuser=True
                 for line in lines:
@@ -147,6 +159,7 @@ def home():
                         if value == username:
                             checkforuser = False
                             print("Here's your current information:")
+                            sec(1)
                             for key, value in info.items():
                                 print(f"{key}: {value}")
                             updateinfo()
@@ -154,6 +167,7 @@ def home():
                 if checkforuser:        
                     print("username not found. Re-type it correctly.")
                     print("If you would like to create an account, type \"create\" to sign-up. Otherwise, click Enter to try again.")
+                    sec(3)
                     backhome=input()
                     if backhome=="create":
                         register()
