@@ -3,6 +3,7 @@ import time
 def sec(x):
     return time.sleep(x)
 
+#-----------------------------------------------------------------------------GETTING USER INFO(2)-------------------------------------------------------------------------
 def user_info(username):
     try:            
         print("Let's get some personal info so we can build the right tracker for YOU!")
@@ -21,7 +22,7 @@ def user_info(username):
         print("Input numbers only.")
         user_info(username)
 
-
+#--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 def home():
     print("**PERSONAL FINANCE TRACKER**\n")
 
@@ -43,6 +44,7 @@ def home():
 
     try:    
         if username =="new":
+#---------------------------------------------------------------------------------REGISTER FUNCTION(1A)---------------------------------------------------------------------           
             def register():
                 db = open("logindatabase.txt", "r")
                 print("*----------------------WELCOME TO PFT v1----------------------*\n")
@@ -98,34 +100,79 @@ def home():
 
             register()
         
+#-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
         if username=="update":
-            username=input("What's your username??\n") 
-            print("Here's your current information:")
-            db = open("personalinfo.txt", "r")
-            lines=db.readlines()
-            db.close()
-            info = {}
-            for line in lines:
-                line.strip()
-                entries = line.split(", ")
-                for entry in entries:
-                    key, value=entry.split(": ")
-                    info[key.strip()]=value.strip()
-                for key, value in info.items():
-                    if value == username:
-                        for key, value in info.items():
-                            print(f"{key}: {value}")       
-                info.clear()
-            update = input("What do you want to change?")
+            def update():
+                username=input("What's your username??\n") 
+                db = open("personalinfo.txt", "r")
+                lines=db.readlines()
+                db.close()
+                info = {}
+                infoinfiles=lines[:]
+   
+                def updateinfo():
+                    newinfo=input("What do you want to change?\n") 
+                    if newinfo in info:
+                        try:
+                            updatevalue=int(input(f"Enter your new {newinfo}. (Type a number)\n"))
+                            info[newinfo]=updatevalue
+                            inputvalue=""
+                            inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
+                            for i, line in enumerate(infoinfiles):
+                                if username in line:
+                                    infoinfiles[i]=inputvalue+"\n"
+                                    break
+                            db=open("personalinfo.txt", "w")
+                            for line in infoinfiles:
+                                db.write(line)
+                            db.close()
+                        except:
+                            print("Make sure to input a number ONLY.")
+                            updateinfo() 
+
+                    else:
+                        print("Invalid entry. Make sure you type one of the following:")
+                        print("budget, income, groceries, transportation, housing, bigpayment, extra")
+                        updateinfo()
+                checkforuser=True
+                for line in lines:
+                    line = line.strip()
+                    entries = line.split(", ")
+                    for entry in entries:
+                        key, value=entry.split(": ")
+                        info[key.strip()]=value.strip()
+
+        
+                    for key, value in info.items():
+                        if value == username:
+                            checkforuser = False
+                            print("Here's your current information:")
+                            for key, value in info.items():
+                                print(f"{key}: {value}")
+                            updateinfo()
+                            break
+                if checkforuser:        
+                    print("username not found. Re-type it correctly.")
+                    print("If you would like to create an account, type \"create\" to sign-up. Otherwise, click Enter to try again.")
+                    backhome=input()
+                    if backhome=="create":
+                        register()
+                    update()                        
+                    info.clear()
+
+            update()
             
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         db = open("logindatabase.txt", "r")
         users = db.readlines()
         db.close()
+        usercheck=True
         for line in users:
             if line.strip():
                 user, pw = line.strip().split(", ")
                 if username==user:
+                    usercheck = False
                     def access():
                         entered_pw = input("P: ")
                         if entered_pw == pw:
@@ -137,6 +184,9 @@ def home():
                             access()
                     access()
                     break
+        if usercheck:
+            print("Username not found. Try again.")
+            home()
 
         
             
