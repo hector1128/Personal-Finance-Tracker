@@ -1,25 +1,70 @@
-name = input("Name: ")
-budget = int(input("How much money do you have?\n"))
-income = int(input("How much do you earn weekly?\n"))
-groceries=int(input("How much do you usually spend on groceries?\n"))
-transportation = int(input("How much do you spend weekly on your car/transportation?\n"))
-housing=int(input("How much do you usually spend on housing?\n"))
-bigpayments=int(input("Do you have any big payments coming up?\n"))
-extra=int(input("Do you spend any extra money apart from what is stated here? If not, type \"0\""))
+def update():
+    username=input("What's your username??\n")
+    #sec(3) 
+    db = open("test.txt", "r")
+    lines=db.readlines()
+    db.close()
+    info = {}
+    infoinfiles=lines[:]
+    def updateinfo():
+        newinfo=input("What do you want to change?\n") 
+        #sec(3)
+        if newinfo in info:
+            try:
+                updatevalue=int(input(f"Enter your new {newinfo}. (Type a number)\n"))
+                #sec(3)
+                if newinfo == "hoursworked":
+                    income = info["income"]
+                    info["income"]=income*updatevalue
+                info[newinfo]=updatevalue
+                inputvalue=""
+                inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
+                for i, line in enumerate(infoinfiles):
+                    if username in line:
+                        infoinfiles[i]=inputvalue+"\n"
+                        break
+                db=open("test.txt", "w")
+                for line in infoinfiles:
+                    db.write(line)
+                db.close()
+            except:
+                print("Make sure to input a number ONLY.")
+                #sec(1)
+                updateinfo() 
 
-class User:
-    def __init__(self, budget, income, groceries, transportation, housing, bigpayments, extra=0):
-        self.budget=budget
-        self.income=income
-        self.groceries=groceries
-        self.transportation=transportation
-        self.housing=housing
-        self.bigpayments=bigpayments
-        self.extra=extra
+        else:
+            print("Invalid entry. Make sure you type one of the following:")
+            print("budget, income, groceries, transportation, housing, bigpayment, extra")
+            #sec(3)
+            updateinfo()
+            checkforuser=True
+            for line in lines:
+                line = line.strip()
+                entries = line.split(", ")
+                for entry in entries:
+                    key, value=entry.split(": ")
+                    info[key.strip()]=value.strip()
 
-name=User(budget, income, groceries, transportation, housing, bigpayments, extra)
+        
+                for key, value in info.items():
+                    if value == username:
+                        checkforuser = False
+                        print("Here's your current information:")
+                        #sec(1)
+                        for key, value in info.items():
+                            print(f"{key}: {value}")
+                        updateinfo()
+                        break
+                if checkforuser:        
+                    print("username not found. Re-type it correctly.")
+                    print("If you would like to create an account, type \"create\" to sign-up. Otherwise, click Enter to try again.")
+                    #sec(3)
+                    backhome=input()
+                    if backhome=="create":
+                        #home()
+                        pass
+                    else:
+                        update()                        
+                    info.clear()
 
-inp=input("Do you wanna see your budget?")
-if inp=="yes":
-    print(name.budget)
-
+update()
