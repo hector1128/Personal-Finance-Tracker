@@ -14,6 +14,7 @@ def access(username, pw):
         sec(1)
         access(username, pw)
 
+#-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
 
 def update():
     username=input("What's your username??\n")
@@ -24,72 +25,34 @@ def update():
     info = {}
     infoinfiles=lines[:]
     founduser=False
-
-    def updateinfo():
-        newinfo=input("What do you want to change?\n") 
-        sec(3)
-        if newinfo in info:
-            try:
-                updatevalue=int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
-                sec(3)
-                if newinfo == "hoursworked":
-                    income = int(info["income"])/int(info["hoursworked"])
-                    weeklyearnings = round(income*updatevalue)
-                    info["income"]=weeklyearnings
-                info[newinfo]=updatevalue
-                inputvalue=""
-                inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
-                for i, line in enumerate(infoinfiles):
-                    if username in line:
-                        infoinfiles[i]=inputvalue+"\n"
-                        break
-                db=open("personalinfo.txt", "w")
-                for line in infoinfiles:
-                    db.write(line)
-                db.close()
-                sec(2)
-                print("Here's your updated information:\n")
-                sec(2)
-                for key, value in info.items():
-                    print(f"{key}: {value}")
-                addinfo = input("Would you like to add anything else? If so, type \"add\". Otherwise, click \"Enter\" to go back home.\n")
-                addinfo.lower()
-                if addinfo=="add":
-                    updateinfo()
-                else:
-                    print("Thank you! You will now be redirected to the home page.")
-                    sec(2)
-                    home()
-
-
-            except ValueError:
-                print("Make sure to input a number ONLY.")
-                sec(1)
-                updateinfo() 
-
-        else:
-            print("Invalid entry. Make sure you type one of the following:")
-            print("budget, income, hoursworked, groceries, transportation, housing, bigpayment, extra")
-            sec(3)
-            updateinfo()
     checkforuser=True
+    # Checking each line in file
     for line in lines:
+        # Removes white space of line
         line = line.strip()
+        # Then splits each entry into a list based on ", " into ['username: input', 'budget: input']
         entries = line.split(", ")
+        # Looping through the list "entries"
         for entry in entries:
+            # Splitting each value into username hector.cordero income 200
             key, value=entry.split(": ")
-            info[key.strip()]=value.strip()
+            # Looping through 
+            for items in entry:
+                # Saving the items in the file as a dictionary (JSON) format
+                info[key.strip()]=value.strip()
 
-
+        # Looping through info of file in dictionary (JSON) format
         for key, value in info.items():
+            # If the input from the user matches any value in the username 
             if value == username:
                 checkforuser = False
                 print("Here's your current information:")
                 sec(1)
                 for key, value in info.items():
                     print(f"{key}: {value}")
-                updateinfo()
+                updateinfo(username, infoinfiles, info)
                 break
+
     if checkforuser:        
         print("username not found. Re-type it correctly.")
         print("If you would like to create an account, type \"create\" to sign-up. Otherwise, click Enter to try again.")
@@ -100,6 +63,57 @@ def update():
         else:
             update()                        
         info.clear()
+
+def updateinfo(info, infoinfiles, username):
+    newinfo=input("What do you want to change?\n") 
+    sec(3)
+    if newinfo in info:
+        try:
+            updatevalue=int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
+            sec(3)
+            if newinfo == "hoursworked":
+                income = int(info["income"])/int(info["hoursworked"])
+                weeklyearnings = round(income*updatevalue)
+                info["income"]=weeklyearnings
+            info[newinfo]=updatevalue
+            inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
+            for i, line in enumerate(infoinfiles):
+                if username in line:
+                    infoinfiles[i]=inputvalue+"\n"
+                    break
+            db=open("personalinfo.txt", "w")
+            for line in infoinfiles:
+                db.write(line)
+            db.close()
+            sec(2)
+            print("Here's your updated information:\n")
+            sec(2)
+            for key, value in info.items():
+                print(f"{key}: {value}")
+            addinfo = input("Would you like to add anything else? If so, type \"add\". Otherwise, click \"Enter\" to go back home.\n")
+            addinfo.lower()
+            if addinfo=="add":
+                updateinfo(username, info, infoinfiles)
+            else:
+                print("Thank you! You will now be redirected to the home page.")
+                sec(2)
+                home()
+
+
+        except ValueError:
+            print("Make sure to input a number ONLY.")
+            sec(1)
+            updateinfo(username, info, infoinfiles) 
+
+    else:
+        print("Invalid entry. Make sure you type one of the following:")
+        print("budget, income, hoursworked, groceries, transportation, housing, bigpayment, extra")
+        sec(3)
+        updateinfo(username, info, infoinfiles)
+
+    
+
+#---------------------------------------------------------------------------------REGISTER FUNCTION(1A)---------------------------------------------------------------------
 
 def register():
     db = open("logindatabase.txt", "r")
@@ -153,7 +167,9 @@ def register():
         print("Thank you! You will now be redirected to the home page.")
         sec(3)
         home()
+
 #-----------------------------------------------------------------------------GETTING USER INFO(2)-------------------------------------------------------------------------
+
 def user_info(username):
     try:            
         print("Let's get some personal info so we can build the right tracker for YOU!")
@@ -185,6 +201,7 @@ def user_info(username):
         user_info(username)
 
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
+
 def home():
     founduser=False
     print("**----------------------------------------------------------PERSONAL FINANCE TRACKER**-----------------------------------------------------------------------**\n")
@@ -206,18 +223,16 @@ def home():
     sec(3)
 
     try:    
-#---------------------------------------------------------------------------------REGISTER FUNCTION(1A)---------------------------------------------------------------------
         if username =="new":
             register()
         
-#-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
         if username=="update":
             update()
             
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
         db = open("logindatabase.txt", "r")
         users = db.readlines()
         db.close()
+        
         for line in users:
             if line.strip():
                 user, pw = line.strip().split(", ")
@@ -232,16 +247,4 @@ def home():
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")
 
-    
-
 home()
-
-
-
-
-
-
-
-
-
-

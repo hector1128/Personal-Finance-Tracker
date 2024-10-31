@@ -1,0 +1,1 @@
+username: hectorito, budget: 60, income: 90, hoursworked: 6, groceries: 0, transportation: 0, housing: 0, bigpayment: 0, extra: 0
