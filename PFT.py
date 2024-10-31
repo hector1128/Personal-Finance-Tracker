@@ -17,101 +17,89 @@ def access(username, pw):
 #-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
 
 def update():
-    username=input("What's your username??\n")
-    sec(3) 
+    username = input("What's your username??\n")
+    sec(3)
     db = open("personalinfo.txt", "r")
-    lines=db.readlines()
+    lines = db.readlines()
     db.close()
-    info = {}
-    infoinfiles=lines[:]
-    founduser=False
-    checkforuser=True
+    infoinfiles = lines[:]  # Copy file lines for potential updates
+    founduser = False
+    
     # Checking each line in file
     for line in lines:
-        # Removes white space of line
+        # Remove whitespace and split entries
         line = line.strip()
-        # Then splits each entry into a list based on ", " into ['username: input', 'budget: input']
         entries = line.split(", ")
-        # Looping through the list "entries"
+        info = {}  # Initialize for each user
+        
+        # Populate `info` dictionary for current user
         for entry in entries:
-            # Splitting each value into username hector.cordero income 200
-            key, value=entry.split(": ")
-            # Looping through 
-            for items in entry:
-                # Saving the items in the file as a dictionary (JSON) format
-                info[key.strip()]=value.strip()
+            key, value = entry.split(": ")
+            info[key.strip()] = value.strip()
+        
+        # Check if username matches
+        if info.get("username") == username:
+            founduser = True
+            print("Here's your current information:")
+            sec(1)
+            for key, value in info.items():
+                print(f"{key}: {value}")
+            updateinfo(info, infoinfiles, username)  # Pass correctly
+            break
 
-        # Looping through info of file in dictionary (JSON) format
-        for key, value in info.items():
-            # If the input from the user matches any value in the username 
-            if value == username:
-                checkforuser = False
-                print("Here's your current information:")
-                sec(1)
-                for key, value in info.items():
-                    print(f"{key}: {value}")
-                updateinfo(username, infoinfiles, info)
-                break
-
-    if checkforuser:        
-        print("username not found. Re-type it correctly.")
-        print("If you would like to create an account, type \"create\" to sign-up. Otherwise, click Enter to try again.")
-        sec(3)
-        backhome=input()
-        if backhome=="create":
+    if not founduser:
+        print("Username not found. Re-type it correctly.")
+        backhome = input("Type 'create' to sign-up or press Enter to try again.\n")
+        if backhome.lower() == "create":
             home()
         else:
-            update()                        
-        info.clear()
+            update()
 
 def updateinfo(info, infoinfiles, username):
-    newinfo=input("What do you want to change?\n") 
+    newinfo = input("What do you want to change?\n")
     sec(3)
     if newinfo in info:
         try:
-            updatevalue=int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
+            updatevalue = int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
             sec(3)
             if newinfo == "hoursworked":
-                income = int(info["income"])/int(info["hoursworked"])
-                weeklyearnings = round(income*updatevalue)
-                info["income"]=weeklyearnings
-            info[newinfo]=updatevalue
-            inputvalue=", ".join(f"{key}: {value}" for key, value in info.items())
+                income = int(info["income"]) / int(info["hoursworked"])
+                weeklyearnings = round(income * updatevalue)
+                info["income"] = str(weeklyearnings)
+            info[newinfo] = str(updatevalue)
+            
+            # Update file contents
+            updated_entry = ", ".join(f"{k}: {v}" for k, v in info.items())
             for i, line in enumerate(infoinfiles):
-                if username in line:
-                    infoinfiles[i]=inputvalue+"\n"
+                if f"username: {username}" in line:
+                    infoinfiles[i] = updated_entry + "\n"
                     break
-            db=open("personalinfo.txt", "w")
-            for line in infoinfiles:
-                db.write(line)
-            db.close()
+            
+            with open("personalinfo.txt", "w") as db:
+                db.writelines(infoinfiles)
+                sec(1)
+                
             sec(2)
             print("Here's your updated information:\n")
-            sec(2)
             for key, value in info.items():
                 print(f"{key}: {value}")
-            addinfo = input("Would you like to add anything else? If so, type \"add\". Otherwise, click \"Enter\" to go back home.\n")
-            addinfo.lower()
-            if addinfo=="add":
-                updateinfo(username, info, infoinfiles)
+            print()
+            if input("Type 'add' to update more or press Enter to go back home.\n").lower() == "add":
+                updateinfo(info, infoinfiles, username)
             else:
-                print("Thank you! You will now be redirected to the home page.")
+                print("Thank you! Redirecting to home.")
                 sec(2)
                 home()
-
 
         except ValueError:
             print("Make sure to input a number ONLY.")
             sec(1)
-            updateinfo(username, info, infoinfiles) 
-
+            updateinfo(info, infoinfiles, username)
     else:
-        print("Invalid entry. Make sure you type one of the following:")
-        print("budget, income, hoursworked, groceries, transportation, housing, bigpayment, extra")
+        print("Invalid entry. Type one of: budget, income, hoursworked, groceries, transportation, housing, bigpayment, extra")
         sec(3)
-        updateinfo(username, info, infoinfiles)
+        updateinfo(info, infoinfiles, username)
 
-    
 
 #---------------------------------------------------------------------------------REGISTER FUNCTION(1A)---------------------------------------------------------------------
 
@@ -200,6 +188,17 @@ def user_info(username):
         print("Input numbers only.")
         user_info(username)
 
+def check_user(username):
+    db = open("logindatabase.txt", "r")
+    users = db.readlines()
+    db.close()
+        
+    for line in users:
+        user, pw = line.strip().split(", ")
+        if username==user:
+            return pw
+        else:
+            return None
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 
 def home():
@@ -226,24 +225,14 @@ def home():
         if username =="new":
             register()
         
-        if username=="update":
+        elif username=="update":
             update()
-            
-        db = open("logindatabase.txt", "r")
-        users = db.readlines()
-        db.close()
         
-        for line in users:
-            if line.strip():
-                user, pw = line.strip().split(", ")
-                if username==user:
-                    founduser=True
-                    access(username, pw)
-                    break
-        if not founduser:
-            print("Username not found. Try again.")
-            sec(2)
-            home()
+        else:
+            password = check_user(username)
+            if password:
+                access(username, password)
+                
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")
 
