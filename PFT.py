@@ -1,18 +1,29 @@
 import time
 
+import sys
+
 def sec(x):
     return time.sleep(x)
 
-def access(username, pw):
+def check_login(username):
+    db = open("test.txt", "r")
+    users = db.readlines()
+    db.close()
+    for line in users:
+        user, pw = line.strip().split(", ")
+        if username==user:
+            password=pw
     entered_pw = input("P: ")
-    if entered_pw == pw:
-        sec(2)
-        print(f"*----------------------------------------------------Welcome back {username}!------------------------------------------------------------*")
-        sec(3)
-    else:
-        print("Password incorrect. Try again.")
-        sec(1)
-        access(username, pw)
+    try:
+        if entered_pw == password:
+            sec(2)
+            print(f"*----------------------------------------------------Welcome back {username}!------------------------------------------------------------*")
+        else:
+            print("Password incorrect. Try again.")
+            check_login(username)
+    except NameError:
+        print("Username not found. Try again")
+        home()
 
 #-------------------------------------------------------------------------UPDATE FUNCTION(1B)--------------------------------------------------------------------------------
 
@@ -58,16 +69,37 @@ def update():
 def updateinfo(info, infoinfiles, username):
     newinfo = input("What do you want to change?\n")
     sec(3)
+    if newinfo == "bigpaymentdate":
+        if info["bigpayment"]==0:
+            sec(1)
+            print("You have no payment due. Make sure you add a payment first before adding a date.")
+            sec(1)
+            update(info, infoinfiles, username)
     if newinfo in info:
         try:
-            updatevalue = int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
-            sec(3)
-            if newinfo == "hoursworked":
-                income = int(info["income"]) / int(info["hoursworked"])
-                weeklyearnings = round(income * updatevalue)
-                info["income"] = str(weeklyearnings)
-            info[newinfo] = str(updatevalue)
-            
+            if newinfo == "bigpaymentdate":
+                updatevalue = (input(f"Enter your new {newinfo}. (mm/dd/20xx)\n"))
+                info[newinfo] = updatevalue
+            else:
+                updatevalue = int(input(f"Enter your new {newinfo} info. (Type a number)\n"))
+                sec(3)
+                if newinfo == "hoursworked":
+                    income = int(info["income"]) / int(info["hoursworked"])
+                    weeklyearnings = round(income * updatevalue)
+                    info["income"] = str(weeklyearnings)
+                info[newinfo] = str(updatevalue)
+                
+                if newinfo == "bigpayment":
+                    info[newinfo]=str(updatevalue)
+                    print("When is this big payment due?")
+                    sec(2)
+                    print("Type the date in the following format")
+                    sec(2)
+                    print("mm/dd/20xx")
+                    bigpdate=input()
+                    sec(1)
+                    info["bigpaymentdate"]=str(bigpdate)   
+
             # Update file contents
             updated_entry = ", ".join(f"{k}: {v}" for k, v in info.items())
             for i, line in enumerate(infoinfiles):
@@ -81,9 +113,11 @@ def updateinfo(info, infoinfiles, username):
                 
             sec(2)
             print("Here's your updated information:\n")
+            sec(2)
             for key, value in info.items():
                 print(f"{key}: {value}")
             print()
+            sec(2)
             if input("Type 'add' to update more or press Enter to go back home.\n").lower() == "add":
                 updateinfo(info, infoinfiles, username)
             else:
@@ -96,7 +130,7 @@ def updateinfo(info, infoinfiles, username):
             sec(1)
             updateinfo(info, infoinfiles, username)
     else:
-        print("Invalid entry. Type one of: budget, income, hoursworked, groceries, transportation, housing, bigpayment, extra")
+        print("Invalid entry. Type one of: budget, income, hoursworked, groceries, transportation, housing, bigpayment, bigpaymentdate, extra")
         sec(3)
         updateinfo(info, infoinfiles, username)
 
@@ -171,18 +205,29 @@ def user_info(username):
         hoursworked = int(input("And how many hours do you work per week?\n"))
         income*=hoursworked
         sec(1)
-        groceries=int(input("How much do you usually spend on groceries?\n"))
+        groceries=int(input("How much do you usually spend on groceries weekly?\n"))
         sec(1)
-        transportation = int(input("How much do you spend weekly on your car/transportation?\n"))
+        transportation = int(input("How much do you usually spend on your car/transportation weekly?\n"))
         sec(1)
         housing=int(input("How much do you usually spend on housing monthly?\n"))
         sec(1)
         bigpayment=int(input("Do you have a big payment coming up? If so, state the due as a number. Otherwise, type \"0\"\n"))
+        if bigpayment != 0:
+            sec(1)
+            print("When is this big payment due?")
+            sec(2)
+            print("Type the date in the following format")
+            sec(2)
+            print("mm/dd/20xx")
+            bpdate=input()
+            sec(1)   
+        else:
+            bpdate = "mm/dd/20xx" 
         sec(1)
         extra=int(input("Do you spend any extra money weekly apart from what is stated here? If so, state the due as a number. Otherwise, type \"0\"\n"))
         
         db = open("personalinfo.txt", "a")
-        db.write(f"username: {username}, budget: {budget}, income: {income}, hoursworked: {hoursworked}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, extra: {extra}\n")
+        db.write(f"username: {username}, budget: {budget}, income: {income}, hoursworked: {hoursworked}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, bigpaymentdate: {bpdate}, extra: {extra}\n")
         db.close()
     except ValueError:
         print("Input numbers only.")
@@ -202,7 +247,6 @@ def check_user(username):
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 
 def home():
-    founduser=False
     print("**----------------------------------------------------------PERSONAL FINANCE TRACKER**-----------------------------------------------------------------------**\n")
 
     sec(3)
@@ -211,7 +255,11 @@ def home():
 
     sec(1)
 
-    print("If you wish to update your information type **\"update\"**.\n")
+    print("If you wish to update your information type **\"update\"**.")
+
+    sec(1)
+
+    print("If you wish to exit the program, type **\"exit\"**.\n")
 
     sec(1)
 
@@ -222,17 +270,25 @@ def home():
     sec(3)
 
     try:    
-        if username =="new":
+        if username.lower() =="new":
             register()
         
-        elif username=="update":
+        elif username.lower()=="update":
             update()
+
+        elif username.lower() =="exit":
+            sys.exit(0)
         
         else:
-            password = check_user(username)
-            if password:
-                access(username, password)
-                
+            check_login(username)
+
+        # Show their weekly expenses on a calendar format (Using API)
+
+        # Label entertainment by substracting from extra
+        # Show bigpayment and when it's due (if they have one)
+
+
+
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")
 
