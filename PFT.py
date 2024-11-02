@@ -145,9 +145,15 @@ def register():
 
     name = input("Create a username: ")
 
+    if name.lower() == "exit":
+        sys.exit(0)
+
     sec(1)
 
     pw = input("Create a password: ")
+
+    if pw.lower() == "exit":
+        sys.exit(0)
 
     sec(1)
 
