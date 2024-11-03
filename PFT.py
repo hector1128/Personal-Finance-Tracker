@@ -5,8 +5,26 @@ import sys
 def sec(x):
     return time.sleep(x)
 
+def show_user_data(username):
+    db = open("personalinfo.txt", "r")
+    lines = db.readlines()
+    db.close()
+    userinfo = {}
+    for line in lines:
+        line.strip()
+        info = line.split(", ")
+        for item in info:
+            item.strip()
+            key, value = item.split(": ")
+            userinfo[key] = value
+        if userinfo["username"]==username:
+            pass
+        else:
+            userinfo.clear()
+    
+
 def check_login(username):
-    db = open("test.txt", "r")
+    db = open("logindatabase.txt", "r")
     users = db.readlines()
     db.close()
     for line in users:
@@ -21,7 +39,8 @@ def check_login(username):
         else:
             print("Password incorrect. Try again.")
             check_login(username)
-    except NameError:
+    except NameError as e:
+        print(e)
         print("Username not found. Try again")
         home()
 
@@ -130,7 +149,7 @@ def updateinfo(info, infoinfiles, username):
             sec(1)
             updateinfo(info, infoinfiles, username)
     else:
-        print("Invalid entry. Type one of: budget, income, hoursworked, groceries, transportation, housing, bigpayment, bigpaymentdate, extra")
+        print("Invalid entry. Type one of: budget, savings, income, hoursworked, groceries, transportation, housing, bigpayment, bigpaymentdate, extra")
         sec(3)
         updateinfo(info, infoinfiles, username)
 
@@ -206,11 +225,23 @@ def user_info(username):
         sec(1)
         budget = int(input("How much do you have in checkings? (DOES NOT INCLUDE YOUR SAVINGS)\n"))
         sec(1)
+        savings = int(input("How much do you have in savings? (401K, Roth IRA, Stocks included)\n"))
+        sec(1)
         income = int(input("How much do you earn per hour?\n"))
         sec(1)
         hoursworked = int(input("And how many hours do you work per week?\n"))
         income*=hoursworked
         sec(1)
+        insuranceamt = int(input("How many insurance plans do you currently hold? (Type as a number)\n"))
+        if insuranceamt != 0:
+            insurancetypes={}
+            for insurance in range(insuranceamt):
+                print(f"For your {insurance+1} insurance, what type of insurance is it?")
+                instype = input()
+                print("And how much do you pay for it??")
+                instypeprice = input()
+                insurancetypes[instype]=instypeprice
+            insurances = ", ".join(f"{key}: {value}" for key, value in insurancetypes.items())
         groceries=int(input("How much do you usually spend on groceries weekly?\n"))
         sec(1)
         transportation = int(input("How much do you usually spend on your car/transportation weekly?\n"))
@@ -228,12 +259,15 @@ def user_info(username):
             bpdate=input()
             sec(1)   
         else:
-            bpdate = "mm/dd/20xx" 
+            bpdate = "N/A" 
         sec(1)
         extra=int(input("Do you spend any extra money weekly apart from what is stated here? If so, state the due as a number. Otherwise, type \"0\"\n"))
         
         db = open("personalinfo.txt", "a")
-        db.write(f"username: {username}, budget: {budget}, income: {income}, hoursworked: {hoursworked}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, bigpaymentdate: {bpdate}, extra: {extra}\n")
+        if insuranceamt != 0:
+            db.write(f"username: {username}, budget: {budget}, savings: {savings}, income: {income}, hoursworked: {hoursworked}, {insurances}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, bigpaymentdate: {bpdate}, extra: {extra}\n")
+        else:
+            db.write(f"username: {username}, budget: {budget}, savings: {savings}, income: {income}, hoursworked: {hoursworked}, groceries: {groceries}, transportation: {transportation}, housing: {housing}, bigpayment: {bigpayment}, bigpaymentdate: {bpdate}, extra: {extra}\n")
         db.close()
     except ValueError:
         print("Input numbers only.")
@@ -288,6 +322,44 @@ def home():
         else:
             check_login(username)
 
+        db = open("personalinfo.txt", "r")
+        lines = db.readlines()
+        db.close()
+        personinfo = {}
+        for line in lines:
+            line.strip()
+            info = line.split(", ")
+            for item in info:
+                item.strip()
+                key, value = item.split(": ")
+                personinfo[key] = value
+            if personinfo["username"]==username:
+                pass
+            else:
+                personinfo.clear()
+        titles = list(personinfo.keys())
+
+        print("---------------------------------------")
+        print("| Upcoming Payments |  $$$ (in dollars) |")
+        print("---------------------------------------")
+        print(f"| Weekly Budget | {personinfo["budget"]} |")
+        print("---------------------------------------")
+        print("|     Rent      |                  |")
+        print("---------------------------------------")
+        print("|    Insurance  |                  |")
+        print("---------------------------------------")
+        print("|    Groceries  |                  |")
+        print("---------------------------------------")
+        print("|  Car Payments |                  |")
+        print("---------------------------------------")
+        print("|                  |                  |")
+        print("---------------------------------------")
+        print("|                  |                  |")
+        print("---------------------------------------")
+        
+        
+        #print("CURRENT SAVINGS PORTFOLIO")
+        #print(f"${personinfo["savings"]}\n")
         # Show their weekly expenses on a calendar format (Using API)
 
         # Label entertainment by substracting from extra
