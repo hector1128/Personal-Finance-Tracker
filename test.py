@@ -1,15 +1,23 @@
-insuranceamt = int(input("How many insurance plans do you currently hold? (Type as a number)\n"))
-if insuranceamt != 0:
-    insurancetypes={}
-    for insurance in range(insuranceamt):
-        print(f"For your {insurance+1} insurance, what type of insurance is it?")
-        instype = input()
-        print("And how much do you pay for it??")
-        instypeprice = input()
-        insurancetypes[instype]=instypeprice
-    insurances = ", ".join(f"{key}: {value}" for key, value in insurancetypes.items())
-    print(f"groceries: 80, {insurances}, budget: bomboclat")
-    
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.style.use('_mpl-gallery-nogrid')
+
+
+# make data
+x = [1, 2, 3, 4]
+colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
+
+# plot
+fig, ax = plt.subplots()
+ax.pie(x, colors=colors, radius=3, center=(4, 4),
+       wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True)
+
+ax.set(xlim=(0, 8), xticks=np.arange(1, 8),
+       ylim=(0, 8), yticks=np.arange(1, 8))
+
+plt.show()
+        
 
 
         

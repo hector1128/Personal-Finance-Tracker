@@ -35,12 +35,11 @@ def check_login(username):
     try:
         if entered_pw == password:
             sec(2)
-            print(f"*----------------------------------------------------Welcome back {username}!------------------------------------------------------------*")
+            print(f"*----------------------------------------------------Welcome back {username}!------------------------------------------------------------*\n")
         else:
             print("Password incorrect. Try again.")
             check_login(username)
-    except NameError as e:
-        print(e)
+    except NameError:
         print("Username not found. Try again")
         home()
 
@@ -48,7 +47,7 @@ def check_login(username):
 
 def update():
     username = input("What's your username??\n")
-    sec(3)
+    sec(2)
     db = open("personalinfo.txt", "r")
     lines = db.readlines()
     db.close()
@@ -149,7 +148,7 @@ def updateinfo(info, infoinfiles, username):
             sec(1)
             updateinfo(info, infoinfiles, username)
     else:
-        print("Invalid entry. Type one of: budget, savings, income, hoursworked, groceries, transportation, housing, bigpayment, bigpaymentdate, extra")
+        print("Invalid entry. Type one of the following: budget, savings, income, hoursworked, groceries, transportation, housing, bigpayment, bigpaymentdate, extra")
         sec(3)
         updateinfo(info, infoinfiles, username)
 
@@ -160,7 +159,7 @@ def register():
     db = open("logindatabase.txt", "r")
     print("*---------------------------------------------------------------------WELCOME TO PFT v1----------------------------------------------------------------------*\n")
 
-    sec(3)
+    sec(2)
 
     name = input("Create a username: ")
 
@@ -208,11 +207,11 @@ def register():
         db.write(name + ", " + pw + "\n")
         db.close()
         print(f"Sign up successful. Welcome {name}!")
-        sec(3)
+        sec(2)
         user_info(name)
-        sec(3)
+        sec(2)
         print("Thank you! You will now be redirected to the home page.")
-        sec(3)
+        sec(2)
         home()
 
 #-----------------------------------------------------------------------------GETTING USER INFO(2)-------------------------------------------------------------------------
@@ -285,11 +284,95 @@ def check_user(username):
         else:
             return None
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
+addline_list = [" "]
+def add_line(username, addline_list):
+    label = input("What do you want to title your upcoming payment??\n")
+    price = float(input("And how much do you have to pay??\n"))
+    addline_list.clear()
+    addline_list.append(f"|       {label:<11} |       ${price:<10} |")
+    show_up_payments(username)
+    for item in addline_list:
+        print(item)
+        print("-----------------------------------------")
+    print()
+    again = input("Type \"add\" to add another row, otherwise press enter\n")
+    if again.lower()=="add":
+        add_line(username, addline_list)
+    else:
+        show_up_payments(username)
+
+
+def show_up_payments(username):
+    db = open("personalinfo.txt", "r")
+    lines = db.readlines()
+    db.close()
+    personinfo = {}
+    for line in lines:
+        line.strip()
+        info = line.split(", ")
+        for item in info:
+            item.strip()
+            key, value = item.split(": ")
+            personinfo[key] = value
+        if personinfo["username"]==username:
+            pass
+        else:
+            personinfo.clear()
+    keys = list(personinfo.keys())
+    if personinfo["bigpayment"]!=0:
+        print(f"You have an outstanding payment on {personinfo['bigpaymentdate']}")
+        print(f"{personinfo['bigpayment']}")
+    sec(1)
+    print("-----------------------------------------")
+    print("| UPCOMING PAYMENTS |  $$$ (in dollars) |")
+    print("-----------------------------------------")
+    print(f"|   housing/rent    |       ${personinfo['housing']:<10} |")
+    print("-----------------------------------------")
+    print(f"|  transportation   |       ${personinfo['transportation']:<10} |")
+    print("-----------------------------------------")
+    print(f"|     groceries     |       ${personinfo['groceries']:<10} |")
+    print("-----------------------------------------")
+    if keys[5] != "groceries":
+        for item in range(5, len(keys)):
+            if keys[item] == "groceries":
+                break
+            else:
+                print(f"|  {keys[item]+" insurance":<16} |       ${personinfo[keys[item]]:<10} |")
+                print("-----------------------------------------")
+    print(f"|       extra       |       ${personinfo['extra'].strip():<10} |")
+    print("-----------------------------------------")
+    if addline_list[0]==" ":
+        pass
+    else:
+        for item in addline_list:
+            print(item)
+            print("-----------------------------------------")
+    print()
+    sec(1)
+
+    # Step 1: Find rate of growth for weekly debt 
+    # Step 2: Find rate of growth for income
+    # If ROG of debt > ROG of income:
+        # print("It seems your debt is increasing faster than your income")
+        # print("Based on your personal situation, I'd suggest reducing the following:")
+        # arrange debts from lowest to biggest
+        # list 5 lowest debt amounts
+    # print(Here's your calculated weekly budget:)
+    # if 
+    sec(1)
+    print("")
+    print("If you want to add a line to your upcoming payments, type \"add\"")
+    sec(1)
+    print("If you want to see your payments in a pie chart, type \"pie\". (CURRENTLY NOT WORKING)\n")
+    function = input()
+    if function == "add":
+        add_line(username, addline_list)
+
 
 def home():
     print("**----------------------------------------------------------PERSONAL FINANCE TRACKER**-----------------------------------------------------------------------**\n")
 
-    sec(3)
+    sec(2)
 
     print("If you don't have an acccount, type **\"new\"** to sign up.")
 
@@ -322,51 +405,8 @@ def home():
         else:
             check_login(username)
 
-        db = open("personalinfo.txt", "r")
-        lines = db.readlines()
-        db.close()
-        personinfo = {}
-        for line in lines:
-            line.strip()
-            info = line.split(", ")
-            for item in info:
-                item.strip()
-                key, value = item.split(": ")
-                personinfo[key] = value
-            if personinfo["username"]==username:
-                pass
-            else:
-                personinfo.clear()
-        titles = list(personinfo.keys())
-
-        print("---------------------------------------")
-        print("| Upcoming Payments |  $$$ (in dollars) |")
-        print("---------------------------------------")
-        print(f"| Weekly Budget | {personinfo["budget"]} |")
-        print("---------------------------------------")
-        print("|     Rent      |                  |")
-        print("---------------------------------------")
-        print("|    Insurance  |                  |")
-        print("---------------------------------------")
-        print("|    Groceries  |                  |")
-        print("---------------------------------------")
-        print("|  Car Payments |                  |")
-        print("---------------------------------------")
-        print("|                  |                  |")
-        print("---------------------------------------")
-        print("|                  |                  |")
-        print("---------------------------------------")
+        show_up_payments(username)
         
-        
-        #print("CURRENT SAVINGS PORTFOLIO")
-        #print(f"${personinfo["savings"]}\n")
-        # Show their weekly expenses on a calendar format (Using API)
-
-        # Label entertainment by substracting from extra
-        # Show bigpayment and when it's due (if they have one)
-
-
-
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")
 
