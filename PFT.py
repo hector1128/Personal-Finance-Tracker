@@ -302,6 +302,7 @@ def add_line(username, addline_list):
         show_up_payments(username)
 
 
+
 def show_up_payments(username):
     db = open("personalinfo.txt", "r")
     lines = db.readlines()
@@ -319,9 +320,11 @@ def show_up_payments(username):
         else:
             personinfo.clear()
     keys = list(personinfo.keys())
-    if personinfo["bigpayment"]!=0:
-        print(f"You have an outstanding payment on {personinfo['bigpaymentdate']}")
-        print(f"{personinfo['bigpayment']}")
+
+    if int(personinfo["bigpayment"])!=0:
+        print(f"You have an upcoming large payment on {personinfo['bigpaymentdate']}")
+        print(f"${personinfo['bigpayment']}\n")
+
     sec(1)
     print("-----------------------------------------")
     print("| UPCOMING PAYMENTS |  $$$ (in dollars) |")
@@ -349,16 +352,56 @@ def show_up_payments(username):
             print("-----------------------------------------")
     print()
     sec(1)
+    expenseslist=[]
+    for value in personinfo.values():
+        expenseslist.append(value)
+    expenseslist.pop(0)
+    expenseslist.pop(1)
+    expenseslist.pop(2)
+    expenseslist.pop(3)
+    expenseslist.pop(4)
+    expenseslist.pop(-2)
+    last = expenseslist[-1]
+    last_no_n = last[:-1]
+    expenseslist.pop(-1)
+    expenseslist.append(last_no_n)
+    expenses = 0
+    for i in expenseslist:
+        expenses+=int(i)
+    incomeweekly = int(personinfo['income']) * 52
+    income = incomeweekly/12
 
-    # Step 1: Find rate of growth for weekly debt 
+    if income*0.65>expenses or income*0.75>expenses:
+        pass
+    elif income>expenses:
+        pass
+    elif income<expenses:
+        print("It seems your debt is increasing faster than your income")
+        print("Based on your personal situation, I'd suggest reducing the following:")
+        sort_exp_list = sorted(expenseslist)
+        print(sort_exp_list)
+        top_5_exp = sort_exp_list[:5]
+        print(top_5_exp)
+        for item in top_5_exp:
+            print(f"${item}")
+        
+        # arrange expenses from lowest to biggest
+        
+        #for i in range(len(expenseslist_ltoh)):
+            #if expenseslist_ltoh[1]<=5:
+                #print(expenseslist_ltoh[i])
+
+        # list 5 lowest debt amounts
+    # Step 1: Find rate of growth for weekly expenses 
     # Step 2: Find rate of growth for income
-    # If ROG of debt > ROG of income:
+    # If ROG of expenses > ROG of income:
         # print("It seems your debt is increasing faster than your income")
         # print("Based on your personal situation, I'd suggest reducing the following:")
-        # arrange debts from lowest to biggest
+        # arrange expenses from lowest to biggest
         # list 5 lowest debt amounts
     # print(Here's your calculated weekly budget:)
-    # if 
+    # if
+    print() 
     sec(1)
     print("")
     print("If you want to add a line to your upcoming payments, type \"add\"")
