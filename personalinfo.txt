@@ -1,3 +1,4 @@
 username: hector1128, budget: 200, savings: 2000, income: 168, hoursworked: 12, groceries: 50, transportation: 0, housing: 500, bigpayment: 0, bigpaymentdate: mm/dd/20xx, extra: 0
 username: tyak, budget: 800000, savings: 1000000000, income: 90, hoursworked: 90, car: 1000, life: 1, rental: 10, dental: 9, phone: 35, groceries: 100, transportation: 50, housing: 700, bigpayment: 400, bigpaymentdate: 12/14/2024, extra: 100
 username: devon, budget: 1, savings: 1, income: 6, hoursworked: 3, dental: 200, car: 60, life: 40, phone: 300, groceries: 200, transportation: 29, housing: 70, bigpayment: 0, bigpaymentdate: N/A, extra: 0
+username: hectorcordero, budget: 200, savings: 0, income: 60, hoursworked: 4, groceries: 20, transportation: 0, housing: 5000, bigpayment: 650, bigpaymentdate: 11/30/2024, extra: 30

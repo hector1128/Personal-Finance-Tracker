@@ -241,6 +241,7 @@ def user_info(username):
                 instypeprice = input()
                 insurancetypes[instype]=instypeprice
             insurances = ", ".join(f"{key}: {value}" for key, value in insurancetypes.items())
+        sec(1)
         groceries=int(input("How much do you usually spend on groceries weekly?\n"))
         sec(1)
         transportation = int(input("How much do you usually spend on your car/transportation weekly?\n"))
@@ -285,11 +286,13 @@ def check_user(username):
             return None
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 addline_list = [" "]
-def add_line(username, addline_list):
+def add_line(username, addline_list, personinfo):
     label = input("What do you want to title your upcoming payment??\n")
-    price = float(input("And how much do you have to pay??\n"))
+    price = int(input("And how much do you have to pay??\n"))
+    personinfo[label]=price 
+    db=open("personalinfo.txt", "")
     addline_list.clear()
-    addline_list.append(f"|       {label:<11} |       ${price:<10} |")
+    addline_list.append(f"|      {label:<12} |       ${price:<10} |")
     show_up_payments(username)
     for item in addline_list:
         print(item)
@@ -322,7 +325,7 @@ def show_up_payments(username):
     keys = list(personinfo.keys())
 
     if int(personinfo["bigpayment"])!=0:
-        print(f"You have an upcoming large payment on {personinfo['bigpaymentdate']}")
+        print(f"***You have an upcoming large payment on {personinfo['bigpaymentdate']}***\n")
         print(f"${personinfo['bigpayment']}\n")
 
     sec(1)
@@ -352,64 +355,53 @@ def show_up_payments(username):
             print("-----------------------------------------")
     print()
     sec(1)
-    expenseslist=[]
-    for value in personinfo.values():
-        expenseslist.append(value)
-    expenseslist.pop(0)
-    expenseslist.pop(1)
-    expenseslist.pop(2)
-    expenseslist.pop(3)
-    expenseslist.pop(4)
-    expenseslist.pop(-2)
-    last = expenseslist[-1]
-    last_no_n = last[:-1]
-    expenseslist.pop(-1)
-    expenseslist.append(last_no_n)
-    expenses = 0
-    for i in expenseslist:
-        expenses+=int(i)
+    expenseslist={}
+    for key, value in personinfo.items():
+        expenseslist[key.strip()]=value.strip()
+    expenseslist.pop("budget")
+    expenseslist.pop("username")
+    expenseslist.pop("savings")
+    expenseslist.pop("income")
+    expenseslist.pop("hoursworked")
+    expenseslist.pop("bigpaymentdate")
+    cumexpenses = 0
+    for value in expenseslist.values():
+        cumexpenses+=int(value)
     incomeweekly = int(personinfo['income']) * 52
     income = incomeweekly/12
-
+    expenses = cumexpenses/12
     if income*0.65>expenses or income*0.75>expenses:
         pass
     elif income>expenses:
         pass
     elif income<expenses:
         print("It seems your debt is increasing faster than your income")
-        print("Based on your personal situation, I'd suggest reducing the following:")
-        sort_exp_list = sorted(expenseslist)
-        print(sort_exp_list)
-        top_5_exp = sort_exp_list[:5]
-        print(top_5_exp)
-        for item in top_5_exp:
-            print(f"${item}")
-        
-        # arrange expenses from lowest to biggest
-        
-        #for i in range(len(expenseslist_ltoh)):
-            #if expenseslist_ltoh[1]<=5:
-                #print(expenseslist_ltoh[i])
+        print(f"You are earning ${income}, while spending a total of ${expenses} monthly")
+        print("Based on your personal situation, I'd suggest reducing or removing the following payments:\n")
+        sorteddict = dict(sorted(expenseslist.items(), key=lambda item: item[1]))
+        for key, value in sorteddict.items():
+            print(f"{key}: {value}")
 
-        # list 5 lowest debt amounts
-    # Step 1: Find rate of growth for weekly expenses 
-    # Step 2: Find rate of growth for income
-    # If ROG of expenses > ROG of income:
-        # print("It seems your debt is increasing faster than your income")
-        # print("Based on your personal situation, I'd suggest reducing the following:")
-        # arrange expenses from lowest to biggest
-        # list 5 lowest debt amounts
-    # print(Here's your calculated weekly budget:)
-    # if
     print() 
     sec(1)
     print("")
     print("If you want to add a line to your upcoming payments, type \"add\"")
     sec(1)
-    print("If you want to see your payments in a pie chart, type \"pie\". (CURRENTLY NOT WORKING)\n")
+    print("To remove a line, type \"delete\".")
+    sec(1)
+    print("If you want to see your payments in a pie chart, type \"pie\". (CURRENTLY NOT WORKING)")
+    sec(1)
+    print("If you wish to exit the program, type \"exit\".\n")
     function = input()
-    if function == "add":
-        add_line(username, addline_list)
+    while True:
+        if function == "add":
+            add_line(username, addline_list, personinfo)
+        if function == "exit":
+            sys.exit(0)
+        else:
+            print("Make sure to type \"add\", \"delete\", \"pie\", or \"exit\".\n")
+            function = input()
+
 
 
 def home():

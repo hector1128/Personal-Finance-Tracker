@@ -1,2 +1,2 @@
-username: hector1128, budget: 200, income: 168, hoursworked: 12, groceries: 50, transportation: 0, housing: 500, bigpayment: 0, bigpaymentdate: mm/dd/20xx, extra: 0
-username: james.williams, budget: 200, income: 168, hoursworked: 12, groceries: 50, transportation: 0, housing: 500, bigpayment: 0, bigpaymentdate: mm/dd/20xx, extra: 0
+username: hector1128, budget: 200, 
+username: james.williams, budget: 200
