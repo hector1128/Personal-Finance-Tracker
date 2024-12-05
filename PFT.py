@@ -2,6 +2,11 @@ import time
 
 import sys
 
+from datetime import datetime
+
+current_date = datetime.now()
+
+current_month = current_date.strftime("%B")
 def sec(x):
     return time.sleep(x)
 
@@ -286,31 +291,12 @@ def check_user(username):
             return None
 #--------------------------------------------------------------------------------HOME FUNCTION(1)--------------------------------------------------------------------------
 addline_list = [" "]
-def add_line(username, addline_list, personinfo):
-    label = input("What do you want to title your upcoming payment??\n")
-    price = int(input("And how much do you have to pay??\n"))
-    personinfo[label]=price 
-    db=open("personalinfo.txt", "")
-    addline_list.clear()
-    addline_list.append(f"|      {label:<12} |       ${price:<10} |")
-    show_up_payments(username)
-    for item in addline_list:
-        print(item)
-        print("-----------------------------------------")
-    print()
-    again = input("Type \"add\" to add another row, otherwise press enter\n")
-    if again.lower()=="add":
-        add_line(username, addline_list)
-    else:
-        show_up_payments(username)
-
-
-
-def show_up_payments(username):
+def delete_line(username, cumexpenses, expenseslist, count):
     db = open("personalinfo.txt", "r")
     lines = db.readlines()
     db.close()
     personinfo = {}
+    count=0
     for line in lines:
         line.strip()
         info = line.split(", ")
@@ -318,15 +304,105 @@ def show_up_payments(username):
             item.strip()
             key, value = item.split(": ")
             personinfo[key] = value
-        if personinfo["username"]==username:
-            pass
+        if personinfo["username"].strip()==username:
+            break
         else:
             personinfo.clear()
+            count+=1
+    del_item = input("What is the name of the item you would like to delete?\n")
+    sec(1)
+    cumexpenses-=int(personinfo[del_item])
+    personinfo.pop(del_item)
+    newcontent = ", ".join(f"{key}: {value}" for key, value in personinfo.items())
+    modify_line_in_file(count, newcontent)
+    print()
+    again = input("Type \"delete\" to delete another row, otherwise press enter\n")
+    if again.lower()=="delete":
+        sec(1)
+        delete_line(username, cumexpenses, expenseslist, count)
+    else:
+        sec(1)
+        show_up_payments(username, cumexpenses)
+    pass
+def add_line(username, addline_list, personinfo, cumexpenses, count):
+    label = input("What do you want to title your upcoming payment??\n")
+    price = int(input("And how much do you have to pay??\n"))
+    cumexpenses+=price
+    personinfo["extra"]=personinfo["extra"].strip("\n")
+    personinfo[label]=price 
+    newcontent = ", ".join(f"{key}: {value}" for key, value in personinfo.items())
+    modify_line_in_file(count, newcontent)
+    addline_list.clear()
+    addline_list.append(f"|      {label:<12} |       ${price:<10} |")
+    print()
+    again = input("Type \"add\" to add another row, otherwise press enter\n")
+    if again.lower()=="add":
+        add_line(username, addline_list, personinfo, cumexpenses, count)
+    else:
+        show_up_payments(username, cumexpenses)
+    
+
+def modify_line_in_file(count, new_content):
+    # Read all lines from the file
+    file = open("personalinfo.txt", "r")
+    lines = file.readlines()
+    file.close()
+
+    # Modify the desired line
+    if 0 <= count < len(lines):
+        lines[count] = new_content + "\n"
+    else:
+        print("Line number out of range.")
+
+    # Write all lines back to the file
+    db = open("personalinfo.txt", "w")
+    db.writelines(lines)
+    db.close()
+
+def show_up_payments(username, cumexpenses):
+    db = open("personalinfo.txt", "r")
+    lines = db.readlines()
+    db.close()
+    personinfo = {}
+    count=0
+    for line in lines:
+        line.strip()
+        info = line.split(", ")
+        for item in info:
+            item.strip()
+            key, value = item.split(": ")
+            personinfo[key] = value
+        if personinfo["username"].strip()==username:
+            break
+        else:
+            personinfo.clear()
+            count+=1
     keys = list(personinfo.keys())
+
+    expenseslist={}
+    for key, value in personinfo.items():
+        expenseslist[key.strip()]=value.strip()
+    expenseslist.pop("budget")
+    expenseslist.pop("username")
+    expenseslist.pop("savings")
+    expenseslist.pop("income")
+    expenseslist.pop("hoursworked")
+    expenseslist.pop("bigpaymentdate")
+    expensestemp=0
+    if cumexpenses==0:
+        for value in expenseslist.values():
+            expensestemp+=int(value)
+        cumexpenses+=expensestemp
+    incomeweekly = int(personinfo['income']) * 52
+    income = incomeweekly/12
+    expenses = cumexpenses/12
 
     if int(personinfo["bigpayment"])!=0:
         print(f"***You have an upcoming large payment on {personinfo['bigpaymentdate']}***\n")
         print(f"${personinfo['bigpayment']}\n")
+
+    print(f"Here are your upcoming payments for the month of {current_month}")
+    print()
 
     sec(1)
     print("-----------------------------------------")
@@ -338,38 +414,31 @@ def show_up_payments(username):
     print("-----------------------------------------")
     print(f"|     groceries     |       ${personinfo['groceries']:<10} |")
     print("-----------------------------------------")
+    insuranceamt = 0
     if keys[5] != "groceries":
         for item in range(5, len(keys)):
             if keys[item] == "groceries":
                 break
             else:
+                insuranceamt+=1
                 print(f"|  {keys[item]+" insurance":<16} |       ${personinfo[keys[item]]:<10} |")
                 print("-----------------------------------------")
     print(f"|       extra       |       ${personinfo['extra'].strip():<10} |")
     print("-----------------------------------------")
-    if addline_list[0]==" ":
+    labels=[]
+    for key in personinfo.keys():
+        labels.append(key)
+    if labels[11+insuranceamt:]==" ":
         pass
     else:
-        for item in addline_list:
-            print(item)
+        for item in labels[11+insuranceamt:]:
+            personinfo[item]=personinfo[item].strip()
+            print(f"|  {item:<16} |       ${personinfo[item]:<10} |")
             print("-----------------------------------------")
+    print(f"|       total       |       ${cumexpenses:<10} |")
+    print("-----------------------------------------")
     print()
     sec(1)
-    expenseslist={}
-    for key, value in personinfo.items():
-        expenseslist[key.strip()]=value.strip()
-    expenseslist.pop("budget")
-    expenseslist.pop("username")
-    expenseslist.pop("savings")
-    expenseslist.pop("income")
-    expenseslist.pop("hoursworked")
-    expenseslist.pop("bigpaymentdate")
-    cumexpenses = 0
-    for value in expenseslist.values():
-        cumexpenses+=int(value)
-    incomeweekly = int(personinfo['income']) * 52
-    income = incomeweekly/12
-    expenses = cumexpenses/12
     if income*0.65>expenses or income*0.75>expenses:
         pass
     elif income>expenses:
@@ -395,16 +464,22 @@ def show_up_payments(username):
     function = input()
     while True:
         if function == "add":
-            add_line(username, addline_list, personinfo)
+            sec(1)
+            add_line(username, addline_list, personinfo, cumexpenses, count)
+        if function== "delete":
+            sec(1)
+            delete_line(username, cumexpenses, expenseslist, count)
         if function == "exit":
             sys.exit(0)
         else:
+            sec(1)
             print("Make sure to type \"add\", \"delete\", \"pie\", or \"exit\".\n")
             function = input()
 
 
 
 def home():
+    cumexpenses=0
     print("**----------------------------------------------------------PERSONAL FINANCE TRACKER**-----------------------------------------------------------------------**\n")
 
     sec(2)
@@ -440,7 +515,7 @@ def home():
         else:
             check_login(username)
 
-        show_up_payments(username)
+        show_up_payments(username, cumexpenses)
         
     except SyntaxError:
         print("Invalid character. Run the program again and use valid characters.")

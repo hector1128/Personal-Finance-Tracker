@@ -1,2 +1,2 @@
-username: hector1128, budget: 200, 
-username: james.williams, budget: 200
+username: hector1128, budget: 200, test: 0
+username: hector1128, budget: 200, test: 0
